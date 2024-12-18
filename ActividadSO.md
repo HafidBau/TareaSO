@@ -1182,3 +1182,488 @@ La memoria caché es un área de almacenamiento de alta velocidad que almacena t
 ## Conclusión
 
 El uso de memoria caché es una técnica esencial para optimizar las operaciones de entrada/salida, mejorar el rendimiento del sistema y ofrecer una experiencia de usuario más eficiente. Al minimizar los tiempos de acceso a datos y optimizar el uso del ancho de banda, la memoria caché es clave en la gestión eficaz de los recursos del sistema.
+
+
+# Actividades: Dispositivos de entrada y salida en Linux
+
+# Actividad 1: Listar dispositivos conectados
+
+## 1. ¿Qué tipos de dispositivos se muestran en la salida de `lsblk`?
+El comando `lsblk` lista los dispositivos de bloque, tales como discos duros, SSDs, particiones y unidades USB conectadas. La salida muestra información sobre:
+- El nombre de los dispositivos (por ejemplo, `sda`, `sdb`, `nvme0n1`).
+- El tipo de dispositivo (por ejemplo, `disk`, `part` para particiones).
+- El tamaño de los dispositivos.
+- El punto de montaje, si está disponible (por ejemplo, `/mnt`, `/home`).
+
+En resumen, `lsblk` muestra la estructura de almacenamiento en el sistema, tanto a nivel de discos como de particiones.
+
+## 2. ¿Cuál es la diferencia entre `lsusb` y `lspci`?
+- **`lsusb`**: Lista los dispositivos conectados a los puertos USB de tu computadora. Muestra dispositivos como teclados, ratones, impresoras, cámaras, unidades USB, entre otros. Cada dispositivo USB conectado tendrá un identificador único, con el fabricante y el ID del producto.
+  
+- **`lspci`**: Muestra los dispositivos conectados al bus PCI de la computadora. Esto incluye tarjetas gráficas, tarjetas de red, controladores de almacenamiento, entre otros dispositivos internos que están conectados a través de la interfaz PCI (Peripheral Component Interconnect). La salida incluye detalles como el fabricante y el tipo de dispositivo conectado.
+
+**Diferencia principal**: `lsusb` se enfoca en dispositivos conectados a puertos USB, mientras que `lspci` lista dispositivos conectados a través de la interfaz PCI, que son típicamente internos.
+
+## 3. ¿Qué información adicional proporciona `dmesg | grep usb`?
+El comando `dmesg` muestra los mensajes del kernel de Linux, que incluyen información sobre el arranque del sistema, controladores y hardware. Al ejecutar `dmesg | grep usb`, se filtran los mensajes que están relacionados con dispositivos USB. Esto puede incluir:
+- Información sobre el reconocimiento de dispositivos USB al conectarse.
+- Mensajes de errores o advertencias relacionadas con dispositivos USB.
+- Carga de controladores para dispositivos USB.
+- Detalles sobre la velocidad de conexión (por ejemplo, USB 2.0, 3.0, etc.).
+
+En resumen, este comando proporciona información detallada sobre los eventos del kernel relacionados con la conexión y operación de dispositivos USB.
+
+## Actividad 2: Verificar dispositivos de almacenamiento
+
+### 1. ¿Qué dispositivos de almacenamiento están conectados a su sistema?
+El comando `fdisk -l` lista todos los discos y sus particiones. La salida típicamente muestra información como:
+- Los dispositivos de almacenamiento conectados (por ejemplo, `/dev/sda`, `/dev/sdb`, `/dev/nvme0n1`).
+- El tamaño de cada disco.
+- La tabla de particiones de cada disco (por ejemplo, GPT o MBR).
+  
+A partir de esta salida, puedes identificar los discos duros, SSDs y otros dispositivos de almacenamiento conectados a tu sistema.
+
+### 2. ¿Qué particiones están montadas actualmente?
+El comando `df -h` muestra los dispositivos de almacenamiento montados en el sistema, así como el espacio disponible en cada uno. La salida incluye:
+- Las particiones montadas (por ejemplo, `/dev/sda1`, `/dev/nvme0n1p1`).
+- El punto de montaje correspondiente (por ejemplo, `/`, `/home`, `/mnt`).
+- El espacio total, utilizado y disponible de cada partición.
+
+Con esta información, puedes identificar qué particiones están montadas y dónde están ubicadas en tu sistema de archivos.
+
+### 3. ¿Qué tipo de sistemas de archivos se usan en las particiones?
+El comando `blkid` muestra los identificadores UUID y los tipos de sistema de archivos de las particiones. La salida incluye:
+- El UUID de cada partición.
+- El tipo de sistema de archivos (por ejemplo, `ext4`, `ntfs`, `vfat`, `xfs`).
+  
+
+## Actividad 3: Explorar dispositivos de entrada
+
+### 1. ¿Qué eventos genera cada dispositivo al interactuar con ellos?
+Al ejecutar `evtest`, se pueden monitorear los eventos generados por dispositivos de entrada como teclados, ratones y otros. Los tipos de eventos que generan son:
+
+- **Teclado**: El teclado genera eventos relacionados con la pulsación y liberación de teclas. Estos eventos se representan con códigos numéricos para cada tecla presionada o liberada. Por ejemplo, al presionar una tecla, se genera un evento `EV_KEY` con el código de la tecla correspondiente (por ejemplo, `KEY_A` para la tecla 'A'). También puede haber eventos de repetición si la tecla se mantiene presionada.
+  
+- **Mouse (Ratón)**: El ratón genera eventos relacionados con el movimiento y los clics. Los eventos más comunes son:
+  - `EV_REL` para el movimiento relativo del ratón (ejes X y Y).
+  - `EV_KEY` para los clics de los botones del ratón (por ejemplo, botones izquierdo, derecho y medio).
+  
+- **Controladores USB adicionales**: Otros dispositivos USB, como controladores de juegos o cámaras, también generan eventos. Estos pueden variar según el dispositivo, pero comúnmente incluyen eventos de botones o movimiento, y en el caso de las cámaras, podrían generar eventos relacionados con la activación o desactivación de la cámara.
+
+#### Resumen de los eventos:
+- **Teclado**: `EV_KEY` (presión y liberación de teclas).
+- **Ratón**: `EV_REL` (movimiento), `EV_KEY` (clics).
+- **Controladores USB adicionales**: Eventos de botones, movimiento u otros específicos de cada dispositivo.
+
+### 2. ¿Cómo se identifican los dispositivos en `/proc/bus/input/devices`?
+El archivo `/proc/bus/input/devices` contiene información sobre los dispositivos de entrada conectados al sistema. La salida muestra detalles como:
+- **Nombre del dispositivo**: Indica el nombre del dispositivo de entrada (por ejemplo, "AT Translated Set 2 keyboard" para un teclado).
+- **ID del dispositivo**: Un identificador único para cada dispositivo de entrada.
+- **Tipo de dispositivo**: El tipo de dispositivo de entrada (por ejemplo, `keyboard`, `mouse`, `misc`).
+- **Eventos soportados**: Los eventos que el dispositivo puede generar, como `EV_KEY`, `EV_REL`, entre otros.
+- **Archivo de dispositivo**: El archivo de dispositivo asociado con el dispositivo de entrada (por ejemplo, `/dev/input/eventX`).
+
+En la salida de este archivo, cada dispositivo de entrada está listado con su información asociada, y se puede identificar por el nombre y los tipos de eventos que soporta. Los dispositivos generalmente están separados por bloques de texto, y cada dispositivo tiene una serie de atributos que permiten reconocer su tipo y función.
+
+## Actividad 4: Examinar dispositivos de salida
+
+### 1. ¿Qué salidas de video están disponibles en su sistema?
+El comando `xrandr` lista las pantallas conectadas y sus resoluciones. La salida típicamente incluye:
+- **Conexiones de video disponibles**: Por ejemplo, `HDMI-1`, `eDP-1`, `VGA-1`.
+- **Resoluciones soportadas**: Cada salida de video tendrá una lista de resoluciones soportadas, como `1920x1080`, `1280x720`, entre otras.
+- **Estado de las pantallas**: El comando muestra si las pantallas están activas o desconectadas, junto con su resolución actual.
+
+Por ejemplo, si tienes una pantalla conectada a través de HDMI y una laptop con pantalla integrada, podrías ver algo como:
+**HDMI-1 connected 1920x1080+0+0 (normal left inverted right) 344mm x 194mm eDP-1 connected 1366x768+0+0 (normal left inverted right) 287mm x 159mm**
+
+
+Esto indica que tienes una pantalla conectada a través de HDMI con una resolución de 1920x1080 y la pantalla integrada de la laptop con una resolución de 1366x768.
+
+#### 2. ¿Qué dispositivos de sonido se detectaron?
+El comando `aplay -l` lista las tarjetas de sonido disponibles en el sistema. La salida muestra:
+- **Tarjetas de sonido**: Cada tarjeta de sonido conectada al sistema, con un identificador numérico (por ejemplo, `card 0`, `card 1`).
+- **Dispositivos de salida**: Cada tarjeta tendrá sus respectivos dispositivos de salida (por ejemplo, `device 0`, `device 1`).
+  
+Un ejemplo de salida podría ser:
+**List of PLAYBACK Hardware Devices card 0: HDMI [HDA ATI HDMI], device 3: HDMI 0 [HDMI 0] Subdevices: 1/1 Subdevice #0: subdevice #0 card 1: PCH [HDA Intel PCH], device 0: ALC892 Analog [ALC892 Analog] Subdevices: 1/1 Subdevice #0: subdevice #0**
+
+Esto muestra dos tarjetas de sonido:
+1. **card 0**: Una tarjeta de sonido HDMI (`HDA ATI HDMI`) con salida en el dispositivo `HDMI 0`.
+2. **card 1**: Una tarjeta de sonido integrada en la placa base (`HDA Intel PCH`) con un dispositivo de salida analógico (`ALC892 Analog`).
+
+#### 3. ¿Qué procesos están usando la tarjeta de sonido?
+El comando `lsof /dev/snd/*` muestra los procesos que están utilizando los dispositivos de sonido en tu sistema. La salida incluye:
+- **Procesos activos**: Muestra qué procesos están utilizando dispositivos de sonido en `/dev/snd/`.
+- **PID de los procesos**: Cada proceso tiene un identificador de proceso (PID).
+- **Archivo de dispositivo de sonido utilizado**: Los archivos correspondientes a los dispositivos de sonido, como `/dev/snd/pcmC0D0p` (para la tarjeta de sonido 0).
+
+Por ejemplo, la salida podría ser algo como:
+**COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME firefox 1234 user 50u CHR 116,10 0t0 12345 /dev/snd/pcmC0D0p**
+
+
+## Actividad 5: Crear un script de resumen
+
+### 1. ¿Qué ventajas tiene usar un script para recopilar esta información?  
+- **Automatización**: Permite ejecutar múltiples comandos de forma automática, ahorrando tiempo y evitando errores humanos.  
+- **Consistencia**: La información se recopila siempre en el mismo formato y orden.  
+- **Registro de información**: La salida guardada en un archivo facilita su análisis posterior.  
+- **Reutilización**: Se puede ejecutar el mismo script en diferentes equipos.  
+- **Simplicidad**: Basta con un solo comando (`bash dispositivos.sh`) para ejecutar todas las tareas.  
+
+### 2. ¿Qué cambios realizaría para personalizar el script?  
+**Añadir fecha y hora**:  
+   ```bash
+   echo "Fecha y Hora:" >> resumendispositivos.txt  
+   date >> resumendispositivos.txt  
+   ```
+## Actividad 6: Reflexión y discusión
+
+### 1. **Versatilidad y Adopción Generalizada**
+- **Amplia adopción**: Linux se utiliza en una variedad de dispositivos, desde servidores y estaciones de trabajo hasta dispositivos embebidos y smartphones.
+- **Crecimiento del mercado**: Se proyecta que el mercado de Linux crecerá de USD 6.27 mil millones en 2022 a USD 22.15 mil millones para 2029, lo que resalta la necesidad de una gestión adecuada de dispositivos para mantenerse competitivo.
+
+### 2. **Desafíos de la Fragmentación**
+- **Ecosistema fragmentado**: Linux cuenta con múltiples distribuciones (distros) que requieren diferentes configuraciones y métodos de gestión, lo que puede aumentar la carga de trabajo del personal de TI.
+- **Soluciones de gestión unificada**: Herramientas como Hexnode Unified Endpoint Management (UEM) permiten gestionar diversas distribuciones desde una única plataforma, simplificando la administración y mejorando la seguridad.
+
+### 3. **Mejora de la Seguridad**
+- **Políticas de seguridad**: La gestión de dispositivos permite implementar políticas de seguridad consistentes, como la gestión de contraseñas y restricciones de acceso a características del dispositivo.
+- **Soporte para configuraciones avanzadas**: Las soluciones de gestión permiten personalizar configuraciones específicas que se alinean con las necesidades operativas de la organización.
+
+### 4. **Facilidad de Mantenimiento y Actualización**
+- **Actualizaciones remotas**: La capacidad de desplegar actualizaciones de sistema operativo de manera remota ayuda a mantener los dispositivos seguros y actualizados, reduciendo vulnerabilidades.
+- **Automatización de tareas**: La ejecución de scripts personalizados y la automatización de tareas de gestión mejoran la eficiencia operativa.
+
+### 5. **Soporte y Resolución de Problemas**
+- **Acciones remotas**: La gestión de dispositivos permite a los administradores solucionar problemas de forma remota, lo que reduce el tiempo de inactividad y mejora la experiencia del usuario.
+- **Asistencia técnica**: Proveedores de soluciones de gestión ofrecen soporte técnico dedicado, lo que facilita la resolución de problemas y la implementación de soluciones.
+
+### 6. **Cumplimiento Normativo**
+- **Regulaciones y estándares**: La gestión de dispositivos ayuda a las organizaciones a cumplir con regulaciones y estándares de seguridad, garantizando que los dispositivos estén configurados y gestionados de acuerdo con las políticas de la empresa.
+
+### 7. **Optimización de Recursos**
+- **Centralización de la gestión**: La gestión unificada de dispositivos permite a las organizaciones optimizar el uso de recursos, reduciendo la necesidad de múltiples herramientas y procesos.
+- **Aumento de la productividad**: Al simplificar la gestión de dispositivos, los equipos de TI pueden centrarse en tareas más estratégicas, mejorando la productividad general.
+
+## Comandos de Entrada y Salida, Discos y Archivos
+
+### Ejercicio 1: Montar y Desmontar Discos
+
+#### **Objetivo**  
+Aprender a montar y desmontar un dispositivo externo.
+
+---
+
+#### **Pasos a seguir**
+
+1. **Inserta una memoria USB en el sistema.**
+
+2. **Encuentra el dispositivo usando el siguiente comando:**
+
+   ```bash
+   lsblk
+    ```
+    o
+    ```bash
+    fdisk -l
+    ```
+3. **Monta la memoria USB en un directorio, por ejemplo, `/mnt/usb:`**
+     ```bash
+    sudo mount /dev/sdX1 /mnt/usb
+    ```
+
+4. **Verifica que esté montado correctamente:**
+    ```bash
+    df -h
+    ```
+
+5. **Copia un archivo desde tu directorio personal al dispositivo USB:**
+    ```bash
+    cp archivo.txt /mnt/usb/
+    ```
+
+6. **Desmonta la memoria USB:**
+     ```bash
+    sudo umount /mnt/usb
+    ```
+
+### **Conclusión**  
+Este ejercicio te enseña a identificar, montar, utilizar y desmontar dispositivos de almacenamiento externos en un sistema Linux mediante comandos básicos. Dominar estos pasos es fundamental para la gestión eficiente de discos y archivos.
+
+
+## Ejercicio 2: Redirección de Entrada y Salida
+### Objetivo: Usar redirección para guardar la salida de comandos en archivos.**
+
+1. **Lista los archivos de tu directorio actual y guarda el resultado en un archivo `listado.txt`:**
+    ```bash
+          ls -l > listado.txt  
+    ```
+2. **Muestra el contenido del archivo en la terminal:**
+    ```bash
+        cat listado.txt  
+    ```
+3. **Añade la fecha actual al final del archivo:**
+     ```bash
+        date >> listado.txt  
+    ```
+4. **Muestra todo el contenido del archivo nuevamente:**
+     ```bash
+      cat listado.txt  
+    ```
+## Ejercicio 3: Copiar y Mover Archivos
+
+### Objetivo
+Practicar cómo copiar y mover archivos y directorios en un sistema Linux.
+
+### Pasos
+
+1. **Crear un archivo de texto**
+Primero, vamos a crear un archivo de texto llamado `archivo1.txt` utilizando el comando `echo`:
+
+```bash
+echo "Este es un archivo de prueba" > archivo1.txt
+```
+    Explicación:
+- `echo "Este es un archivo de prueba"`: Este comando imprime el texto entre comillas.
+- `>:` Este operador redirige la salida del comando al archivo `archivo1.txt` . Si el archivo no existe, se creará; si ya existe, se sobrescribirá.
+
+
+2. **Copiar el archivo a otro directorio**
+Copia el archivo `archivo1.txt` al `directorio /tmp:`
+    ```bash
+    cp archivo1.txt /tmp/
+    ```
+3. **Paso 3: Renombrar el archivo copiado**
+Renombra el archivo copiado a `archivo2.txt` en el directorio `/tmp`:
+    ```bash
+       mv /tmp/archivo1.txt /tmp/archivo2.txt
+    ```
+    Explicación:
+- `mv`: Este comando se utiliza para mover o renombrar archivos y directorios.
+- `/tmp/archivo1.txt`: Es la ruta del archivo que deseas renombrar.
+- `/tmp/archivo2.txt`: Es el nuevo nombre del archivo.
+
+4. **Mover el archivo de vuelta a tu directorio actual**
+Mueve el archivo `archivo2.txt` de vuelta a tu directorio actual:
+
+```bash
+mv /tmp/archivo2.txt .
+```
+Explicación:
+- `.`: Este símbolo representa el directorio actual. Al usarlo como destino, estás indicando que deseas mover el archivo al directorio en el que te encuentras actualmente.
+## Ejercicio 4: Comprimir y Descomprimir Archivos
+### Objetivo
+Aprender a trabajar con la compresión de archivos en un sistema Linux.
+
+---
+
+### Pasos
+
+#### 1. **Crear un directorio llamado `backup`**
+Primero, crea un directorio llamado `backup` y copia algunos archivos en él. Utiliza el siguiente comando:
+
+```bash
+mkdir backup
+```
+Explicación:
+- `mkdir backup`: Este comando crea un nuevo directorio llamado backup.
+
+#### 2. **Copiar algunos archivos al directorio `backup`**
+Copia archivos existentes al directorio recién creado. Por ejemplo, si tienes un archivo llamado archivo1.txt, usa el siguiente comando:
+
+```bash
+cp archivo1.txt backup/
+```
+Explicación:
+- `cp archivo1.txt backup/`: Este comando copia el archivo archivo1.txt al directorio backup.
+
+#### 3. **Comprimir el directorio backup en un archivo .`tar.gz`**
+Comprime el directorio backup en un archivo llamado backup.tar.gz con el siguiente comando:
+
+```bash
+tar -czvf backup.tar.gz backup/
+```
+Explicación:
+- tar: Comando utilizado para crear y manipular archivos tar.
+- `-c`: Crea un nuevo archivo tar.
+- `-z`: Comprime el archivo utilizando gzip.
+- `-v`: Muestra el progreso del proceso en la terminal (modo verbose).
+- `-f`: Especifica que el siguiente argumento es el nombre del archivo tar a crear.
+backup/: Es el directorio que deseas comprimir.
+
+#### 4. **Borrar el directorio original**
+Una vez comprimido el directorio, elimina el directorio original backup con el siguiente comando:
+
+```bash
+rm -r backup
+```
+Explicación:
+- `rm -r backup`: Este comando elimina de forma recursiva el directorio backup y todo su contenido. Ten cuidado al usar este comando, ya que elimina los archivos permanentemente.
+
+#### 5. Extraer el contenido del archivo comprimido
+Extrae el contenido del archivo comprimido backup.tar.gz con este comando:
+
+```bash
+tar -xzvf backup.tar.gz
+```
+Explicación:
+- `-x`: Extrae el contenido del archivo tar.
+- `-z`: Indica que el archivo está comprimido con gzip.
+- `-v`: Muestra el progreso del proceso en la terminal (modo verbose).
+- `-f`: Especifica que el siguiente argumento es el nombre del archivo tar a extraer.
+
+## Ejercicio 5: Permisos y Propiedades de Archivos
+
+### Objetivo
+Aprender a modificar los permisos y propietarios de archivos en un sistema Linux.
+
+---
+
+### Pasos
+
+#### 1. Crear un archivo llamado `privado.txt`
+Crea un archivo vacío llamado `privado.txt` utilizando el comando `touch`:
+
+```bash
+touch privado.txt
+```
+Explicación:
+- `touch privado.txt`: Este comando crea un nuevo archivo vacío llamado privado.txt. Si el archivo ya existe, simplemente actualiza su fecha de modificación.
+
+#### 2. Cambiar los permisos del archivo
+Cambia los permisos del archivo para que solo el propietario pueda leer y escribir. Usa el siguiente comando:
+
+```bash
+chmod 600 privado.txt
+```
+Explicación:
+- `chmod`: Comando para cambiar los permisos de acceso a archivos y directorios.
+- `600`: Establece los permisos:
+    - `6` (lectura y escritura) para el propietario.
+    - `0` (sin permisos) para el grupo.
+    - `0` (sin permisos) para otros usuarios.
+- `privado.txt:` Es el archivo al que se le están modificando los permisos.
+
+#### 3. Cambiar el propietario del archivo
+Si tienes privilegios de superusuario, puedes cambiar el propietario del archivo a otro usuario con el siguiente comando:
+
+```bash
+sudo chown usuario privado.txt
+```
+Explicación:
+- sudo: Ejecuta el comando con privilegios de superusuario.
+- chown: Cambia el propietario de un archivo o directorio.
+- `usuario`: Reemplázalo con el nombre del usuario al que deseas transferir la propiedad del archivo.
+- `privado.txt`: Es el archivo cuyo propietario deseas cambiar.
+
+## Ejercicio 6: Exploración de Dispositivos
+
+### Objetivo
+Identificar discos y particiones en el sistema.
+
+
+### Comandos y Explicaciones
+
+#### 1.  Listar discos y particiones
+Usa el siguiente comando para listar todos los discos y particiones conectados a tu sistema:
+
+```bash
+lsblk
+```
+Explicación:
+
+lsblk: Muestra una lista de todos los dispositivos de bloque (discos y particiones) en el sistema.
+Incluye información como:
+Nombre del dispositivo.
+Tamaño.
+Tipo (partición, disco, etc.).
+Punto de montaje (si está montado).
+
+#### 2. Ver el tamaño del contenido en un directorio
+Para conocer el tamaño total del contenido de un directorio específico, ejecuta:
+
+```bash
+du -sh /ruta/directorio
+```
+Explicación:
+- `du`: Estima el uso del espacio en disco de archivos y directorios.
+- `-s`: Muestra solo el tamaño total del directorio (no desglosa subdirectorios).
+- `-h`: Formatea el tamaño en unidades legibles para humanos (KB, MB, GB).
+- `/ruta/directorio`: Ruta del directorio cuyo tamaño deseas verificar.
+
+#### 3. Verificar el uso del disco
+Para revisar el uso del disco en todo el sistema, utiliza:
+
+```bash
+df -h
+```
+Explicación:
+- `df`: Muestra el uso del espacio en disco de los sistemas de archivos montados.
+- `-h`: Presenta la información en un formato legible para humanos (KB, MB, GB).
+
+## Ejercicio 7: Crear y Formatear Particiones
+
+### Objetivo
+Aprender a crear y formatear una nueva partición utilizando un disco no particionado. Este ejercicio es ideal para un entorno de práctica, como una máquina virtual.
+
+---
+
+### Pasos Detallados
+
+#### 1. Identificar un disco no particionado
+Primero, lista todos los discos y particiones disponibles en tu sistema:
+
+```bash
+sudo fdisk -l
+```
+Explicación:
+
+- `sudo`: Ejecuta el comando con privilegios de superusuario.
+- `fdisk -l`: Muestra todos los discos y sus particiones. Busca un disco sin particiones, como /dev/sdX.
+
+#### 2. Crear una nueva partición
+Utiliza fdisk para crear una nueva partición en el disco identificado (reemplaza `sdX` con el identificador del disco):
+
+```bash
+sudo fdisk /dev/sdX
+```
+Dentro de la interfaz de `fdisk`:
+
+- *Presiona* `n`: Para crear una nueva partición.
+- *Selecciona* `p`: Para una partición primaria.
+- *Elige el número de partición*: Generalmente 1 para la primera partición.
+- A*cepta los valores predeterminados*: Para el primer y último sector (o ajusta el tamaño según necesites).
+- *Presiona* `w`: Para escribir los cambios y salir.
+
+#### 3. Formatear la partición como ext4
+Formatea la partición recién creada como **ext4** (reemplaza `sdX1` con la partición correcta):
+
+```bash
+sudo mkfs.ext4 /dev/sdX1
+```
+Explicación:
+
+- `mkfs.ext4`: Crea un sistema de archivos ext4 en la partición especificada.
+- `/dev/sdX1`: Es la nueva partición que acabas de crear.
+
+#### 4. Montar la partición en un directorio
+Crea un directorio para montar la partición y realiza el montaje:
+
+```bash
+sudo mkdir /mnt/nueva_particion
+sudo mount /dev/sdX1 /mnt/nueva_particion
+```
+Explicación:
+
+- `mkdir /mnt/nueva_particion`: Crea un directorio en `/mnt` para montar la partición.
+- `mount /dev/sdX1 /mnt/nueva_particion`: Monta la partición en el directorio creado.
+
+#### 5. Probar escribiendo archivos en la partición
+Escribe un archivo de prueba en la partición montada:
+
+```bash
+echo "Prueba de escritura" > /mnt/nueva_particion/test.txt
+```
+Explicación:
+- `echo "Prueba de escritura"`: Genera el texto que deseas escribir.
+ `/mnt/nueva_particion/test.txt`: Guarda el texto en un archivo dentro de la nueva partición.
